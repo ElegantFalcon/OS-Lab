@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 void findWaitingTime(int processes[], int n, int bt[], int wt[], int at[])
 {
     wt[0] = 0;
