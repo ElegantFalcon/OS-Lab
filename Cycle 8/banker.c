@@ -1,124 +1,81 @@
 #include <stdio.h>
 
-#define P 5
-#define R 3
-
-void print(int m[][R])
+int main()
 {
+    int n, m, i, j, k;
+    n = 5;
+    m = 3;
+    int alloc[5][3] = {{0, 1, 0},
+                       {2, 0, 0},
+                       {3, 0, 2},
+                       {2, 1, 1},
+                       {0, 0, 2}};
+
+    int max[5][3] = {{7, 5, 3},
+                     {3, 2, 2},
+                     {9, 0, 2},
+                     {2, 2, 2},
+                     {4, 3, 3}};
+
+    int avail[3] = {3, 3, 2};
+    int f[n], ans[n], ind = 0;
+    for (k = 0; k < n; k++)
     {
-        for (int i = 0; i < P; i++)
+        f[k] = 0;
+    }
+
+    int need[n][m];
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < m; j++)
         {
-            for (int j = 0; j < R; j++)
-                printf("%d-", m[i][j]);
-            printf("\n");
+            need[i][j] = max[i][j] - alloc[i][j];
         }
     }
-}
 
-int isSafe(int processes[], int available[], int max[][R], int allot[][R])
-{
-    int need[P][R];
-    int finish[P] = {0};
-
-    for (int i = 0; i < P; i++)
+    int y = 0;
+    for (k = 0; k < n; k++)
     {
-        for (int j = 0; j < R; j++)
+        for (i = 0; i < n; i++)
         {
-            need[i][j] = max[i][j] - allot[i][j];
-        }
-    }
-
-    printf("Resource need\n");
-    print(need);
-
-    int work[R];
-    for (int i = 0; i < R; i++)
-    {
-        work[i] = available[i];
-    }
-
-    int count = 0;
-    while (count < P)
-    {
-        int found = 0;
-        for (int i = 0; i < P; i++)
-        {
-            if (finish[i] == 0)
+            if (f[i] == 0)
             {
-                int j, flag = 1;
-                for (j = 0; j < R; j++)
+                int flag = 0;
+                for (j = 0; j < m; j++)
                 {
-                    if (need[i][j] > work[j])
+                    if (need[i][j] > avail[j])
                     {
-                        flag = 0;
+                        flag = 1;
                         break;
                     }
                 }
-                if (flag == 1)
+                if (flag == 0)
                 {
-                    printf("Available Resources");
-                    for (int k = 0; k < R; k++)
-                        printf("-%d", work[k]);
-
-                    printf("\nprocess-p%d can be allocated resources", i);
-                    for (int k = 0; k < R; k++)
-                        printf("-%d", need[i][k]);
-
-                    for (int k = 0; k < R; k++)
+                    ans[ind++] = i;
+                    for (y = 0; y < m; y++)
                     {
-                        work[k] += allot[i][k];
+                        avail[y] += alloc[i][y];
                     }
-                    printf("\n");
-                    finish[i] = 1;
-                    found = 1;
-                    count++;
+                    f[i] = 1;
                 }
             }
         }
-        if (found == 0)
-        {
-            return 0;
+    }
+
+    int flag = 1;
+
+    for(int i=0;i<n;i++){
+        if(f[i]==0){
+            flag = 0;
+            printf("nah not safe");
+            break;
         }
     }
-    return 1;
-}
 
-void bankerAlgorithm(int processes[], int available[], int max[][R], int allot[][R])
-{
-    if (isSafe(processes, available, max, allot))
-    {
-        printf("Safe state, allocating resources...\n");
+    if(flag==1){
+        printf("It safee homies");
+        for(i=0;i<n;i++){
+            printf("P%d -->",ans[i]);
+        }
     }
-    else
-    {
-        printf("Unsafe state, cannot allocate resources. Possible deadlock.\n");
-    }
-}
-
-int main()
-{
-    int processes[] = {0, 1, 2, 3, 4}; 
-    int available[] = {3, 3, 2};       
-
-    int max[P][R] = {
-        {7, 5, 3},
-        {3, 2, 2},
-        {9, 0, 2},
-        {2, 2, 2},
-        {4, 3, 3}};
-
-    int allot[P][R] = {
-        {0, 1, 0},
-        {2, 0, 0},
-        {3, 0, 2},
-        {2, 1, 1},
-        {0, 0, 2}};
-
-    printf("Max Requirement\n");
-    print(max);
-    printf("Resource Allotment\n");
-    print(allot);
-    bankerAlgorithm(processes, available, max, allot);
-
-    return 0;
 }
